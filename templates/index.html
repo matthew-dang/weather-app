@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Weather App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <h1>Weather App</h1>
+
+  <form id="weather-form" method="POST" action="?unit={{ unit }}">
+    {{ form.hidden_tag() }}
+    {{ form.location.label }} {{ form.location(id="location-input", placeholder="City, ZIP, or coordinates") }}
+    <br><br>
+    <label>
+      <input type="radio" name="unit" value="metric" {% if unit == "metric" %}checked{% endif %}> Celsius (°C)
+    </label>
+    <label>
+      <input type="radio" name="unit" value="imperial" {% if unit == "imperial" %}checked{% endif %}> Fahrenheit (°F)
+    </label>
+    <br><br>
+    {{ form.submit() }}
+    <button type="button" onclick="getLocationAndSubmit()">Use My Location</button>
+  </form>
+
+  {% if weather %}
+    <div class="current-weather">
+      <h2>Current Weather</h2>
+      <p>Temperature: {{ weather.temp }}{{ unit_label }}</p>
+      <p>Description: {{ weather.description }}</p>
+      {% if weather.icon %}
+        <img class="weather-icon" src="http://openweathermap.org/img/wn/{{ weather.icon }}@2x.png" alt="icon">
+      {% endif %}
+    </div>
+  {% elif request.method == "POST" %}
+    <p style="color:red; text-align:center;">Could not find weather for that location. Try again.</p>
+  {% endif %}
+
+  {% if forecast %}
+    <h2>5-Day Forecast</h2>
+    <div class="forecast">
+      {% for day, info in forecast %}
+        <div class="forecast-day">
+          <strong>{{ day }}</strong><br>
+          <img class="weather-icon" src="http://openweathermap.org/img/wn/{{ info.icon }}@2x.png"><br>
+          {{ info.temp }}{{ unit_label }}<br>
+          {{ info.description }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <script>
+    function getLocationAndSubmit() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          const coords = position.coords.latitude + "," + position.coords.longitude;
+          document.getElementById("location-input").value = coords;
+          document.getElementById("weather-form").submit();
+        });
+      } else {
+        alert("Geolocation not supported.");
+      }
+    }
+  </script>
+</body>
+</html>

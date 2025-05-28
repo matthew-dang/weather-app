@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Saved Weather Results</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+    h1, a { margin-bottom: 20px; display: inline-block; }
+  </style>
+</head>
+<body>
+  <h1>Saved Weather Records</h1>
+  <a href="{{ url_for('index') }}">Back to Search</a>
+
+  {% if entries %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Location</th>
+          <th>Temperature (°C)</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in entries %}
+        <tr>
+          <td>{{ entry.id }}</td>
+          <td>{{ entry.location }}</td>
+          <td>{{ entry.temperature }}</td>
+          <td>{{ entry.description }}</td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No weather records saved yet.</p>
+  {% endif %}
+</body>
+</html>
