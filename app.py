@@ -1,12 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, flash, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from forms import WeatherForm
 from weather import get_weather_data, get_coordinates, get_5_day_forecast
 from models import db, WeatherEntry
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secretkey'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///weather.db'
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 db.init_app(app)
 
 with app.app_context():
@@ -22,13 +26,28 @@ def index():
 
     if form.validate_on_submit():
         location = form.location.data
-        lat, lon = get_coordinates(location)
-        weather_info = get_weather_data(location, unit)
-        forecast = get_5_day_forecast(lat, lon, unit)
+        start_date = form.start_date.data
+        end_date = form.end_date.data
 
-        entry = WeatherEntry(location=location,
-                             temperature=weather_info['temp'],
-                             description=weather_info['description'])
+        if start_date > end_date:
+            flash("Start date cannot be after end date.")
+            return redirect(url_for("index"))
+
+        lat, lon = get_coordinates(location)
+        if lat is None:
+            flash("Could not find location.")
+            return redirect(url_for("index"))
+
+        weather_info = get_weather_data(location)
+        forecast = get_5_day_forecast(lat, lon)
+
+        entry = WeatherEntry(
+            location=location,
+            temperature=weather_info['temp'],
+            description=weather_info['description'],
+            start_date=start_date.isoformat(),
+            end_date=end_date.isoformat()
+        )
         db.session.add(entry)
         db.session.commit()
 

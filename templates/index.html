@@ -20,6 +20,11 @@
     <br><br>
     {{ form.submit() }}
     <button type="button" onclick="getLocationAndSubmit()">Use My Location</button>
+    <label>Start Date:</label>
+    {{ form.start_date() }}
+    <br>
+    <label>End Date:</label>
+    {{ form.end_date() }}
   </form>
 
   {% if weather %}

@@ -1,7 +1,10 @@
 import requests
 import re
+import os
+from dotenv import load_dotenv
 
-API_KEY = "55c6766a3ae6b40761cadb99e5e229a5"
+load_dotenv()
+API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
 def detect_location_type(location):
     if re.match(r'^-?\d+\.\d+,\s*-?\d+\.\d+$', location):
