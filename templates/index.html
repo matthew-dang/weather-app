@@ -9,23 +9,37 @@
 
   <form id="weather-form" method="POST" action="?unit={{ unit }}">
     {{ form.hidden_tag() }}
-    {{ form.location.label }} {{ form.location(id="location-input", placeholder="City, ZIP, or coordinates") }}
+
+    <label>{{ form.location.label }}</label>
+    {{ form.location(id="location-input", placeholder="City, ZIP, or coordinates") }}
+    <button type="button" onclick="getLocationAndSubmit()">Use My Location</button>
+
     <br><br>
+
+    <input type="date" name="start_date"
+        min="{{ today }}"
+        max="{{ max_date }}"
+        value="{{ form.start_date.data if form.start_date.data else today }}">
+    <input type="date" name="end_date"
+        min="{{ today }}"
+        max="{{ max_date }}"
+        value="{{ form.end_date.data if form.end_date.data else max_date }}">
+
+    <br><br>
+
     <label>
       <input type="radio" name="unit" value="metric" {% if unit == "metric" %}checked{% endif %}> Celsius (°C)
     </label>
     <label>
       <input type="radio" name="unit" value="imperial" {% if unit == "imperial" %}checked{% endif %}> Fahrenheit (°F)
     </label>
+
     <br><br>
+
     {{ form.submit() }}
-    <button type="button" onclick="getLocationAndSubmit()">Use My Location</button>
-    <label>Start Date:</label>
-    {{ form.start_date() }}
-    <br>
-    <label>End Date:</label>
-    {{ form.end_date() }}
+    <a href="{{ url_for('results') }}" class="button-link">View Saved Weather Records</a>
   </form>
+
 
   {% if weather %}
     <div class="current-weather">
@@ -40,19 +54,31 @@
     <p style="color:red; text-align:center;">Could not find weather for that location. Try again.</p>
   {% endif %}
 
-  {% if forecast %}
-    <h2>5-Day Forecast</h2>
-    <div class="forecast">
-      {% for day, info in forecast %}
-        <div class="forecast-day">
-          <strong>{{ day }}</strong><br>
-          <img class="weather-icon" src="http://openweathermap.org/img/wn/{{ info.icon }}@2x.png"><br>
-          {{ info.temp }}{{ unit_label }}<br>
-          {{ info.description }}
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
+{% if filtered_forecast %}
+  <h2>Forecast for Your Selected Date Range</h2>
+  <div class="forecast custom">
+    {% for day, info in filtered_forecast %}
+      <div class="forecast-day">
+        <strong>{{ day }}</strong><br>
+        <img src="http://openweathermap.org/img/wn/{{ info.icon }}@2x.png">
+        <div>{{ info.temp }}{{ unit_label }} — {{ info.description }}</div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if full_5day_forecast %}
+  <h2>Standard 5-Day Forecast</h2>
+  <div class="forecast standard">
+    {% for day, info in full_5day_forecast %}
+      <div class="forecast-day">
+        <strong>{{ day }}</strong><br>
+        <img src="http://openweathermap.org/img/wn/{{ info.icon }}@2x.png">
+        <div>{{ info.temp }}{{ unit_label }} — {{ info.description }}</div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
 
   <script>
     function getLocationAndSubmit() {

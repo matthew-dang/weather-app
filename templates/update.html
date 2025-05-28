@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Update Weather Entry</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <h1>Update Weather Entry</h1>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <label>Location:</label> {{ form.location() }}<br><br>
+    <label>Start Date:</label> {{ form.start_date() }}<br><br>
+    <label>End Date:</label> {{ form.end_date() }}<br><br>
+    {{ form.submit(value="Update Entry") }}
+  </form>
+
+  <a href="{{ url_for('results') }}" class="button-link">← Back to Results</a>
+</body>
+</html>

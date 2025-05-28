@@ -2,6 +2,8 @@ import requests
 import re
 import os
 from dotenv import load_dotenv
+from datetime import datetime
+
 
 load_dotenv()
 API_KEY = os.getenv("OPENWEATHER_API_KEY")
@@ -9,7 +11,7 @@ API_KEY = os.getenv("OPENWEATHER_API_KEY")
 def detect_location_type(location):
     if re.match(r'^-?\d+\.\d+,\s*-?\d+\.\d+$', location):
         return 'coordinates'
-    if re.match(r'^\d{5}(?:-\d{4})?$', location):  # Accept 5-digit or ZIP+4
+    if re.match(r'^\d{5}(?:-\d{4})?$', location):
         return 'zip'
     return 'name'
 
@@ -73,3 +75,32 @@ def get_5_day_forecast(lat, lon, units='metric'):
                 }
         return list(daily.items())[:5]
     return []
+
+def get_forecast_from_onecall(lat, lon, unit='metric'):
+    url = f"https://api.openweathermap.org/data/3.0/onecall"
+    params = {
+        'lat': lat,
+        'lon': lon,
+        'exclude': 'minutely,hourly,alerts',
+        'units': unit,
+        'appid': os.getenv('OPENWEATHER_API_KEY')
+    }
+
+    res = requests.get(url, params=params)
+    if res.status_code != 200:
+        print("API error:", res.json())
+        return []
+
+    data = res.json().get("daily", [])
+    forecast = []
+
+    for day in data:
+        date = datetime.utcfromtimestamp(day["dt"]).date()
+        forecast.append((date.strftime("%Y-%m-%d"), {
+            'temp': round(day["temp"]["day"]),
+            'description': day["weather"][0]["description"],
+            'icon': day["weather"][0]["icon"]
+        }))
+
+    return forecast
+

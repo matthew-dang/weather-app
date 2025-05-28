@@ -1,9 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, DateField
 from wtforms.validators import DataRequired
+from datetime import date, timedelta
 
 class WeatherForm(FlaskForm):
-    location = StringField('Enter a location:', validators=[DataRequired()])
-    start_date = DateField('Start Date', format='%Y-%m-%d', validators=[DataRequired()])
-    end_date = DateField('End Date', format='%Y-%m-%d', validators=[DataRequired()])
-    submit = SubmitField('Get Weather')
+    location = StringField("Location", validators=[DataRequired()])
+    start_date = DateField("Start Date", default=date.today())
+    end_date = DateField("End Date", default=date.today() + timedelta(days=4))
+    submit = SubmitField("Get Weather")
