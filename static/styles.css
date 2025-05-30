@@ -79,3 +79,20 @@ button, input[type="submit"] {
 .weather-icon {
   width: 60px;
 }
+
+.forecast-map-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.forecast-sections {
+  flex: 2;
+}
+
+.map-embed {
+  flex: 1;
+  min-width: 300px;
+}

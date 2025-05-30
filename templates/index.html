@@ -6,7 +6,15 @@
 </head>
 <body>
   <h1>Weather App</h1>
-
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class="flashes">
+      {% for message in messages %}
+        <li style="color: red; text-align: center;">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
   <form id="weather-form" method="POST" action="?unit={{ unit }}">
     {{ form.hidden_tag() }}
 
@@ -54,31 +62,49 @@
     <p style="color:red; text-align:center;">Could not find weather for that location. Try again.</p>
   {% endif %}
 
-{% if filtered_forecast %}
-  <h2>Forecast for Your Selected Date Range</h2>
-  <div class="forecast custom">
-    {% for day, info in filtered_forecast %}
-      <div class="forecast-day">
-        <strong>{{ day }}</strong><br>
-        <img src="http://openweathermap.org/img/wn/{{ info.icon }}@2x.png">
-        <div>{{ info.temp }}{{ unit_label }} — {{ info.description }}</div>
+<div class="forecast-map-container">
+  <div class="forecast-sections">
+    {% if filtered_forecast %}
+      <h2>Forecast for Your Selected Date Range</h2>
+      <div class="forecast custom">
+        {% for day, info in filtered_forecast %}
+          <div class="forecast-day">
+            <strong>{{ day }}</strong><br>
+            <img src="http://openweathermap.org/img/wn/{{ info.icon }}@2x.png">
+            <div>{{ info.temp }}{{ unit_label }} — {{ info.description }}</div>
+          </div>
+        {% endfor %}
       </div>
-    {% endfor %}
-  </div>
-{% endif %}
+    {% endif %}
 
-{% if full_5day_forecast %}
-  <h2>Standard 5-Day Forecast</h2>
-  <div class="forecast standard">
-    {% for day, info in full_5day_forecast %}
-      <div class="forecast-day">
-        <strong>{{ day }}</strong><br>
-        <img src="http://openweathermap.org/img/wn/{{ info.icon }}@2x.png">
-        <div>{{ info.temp }}{{ unit_label }} — {{ info.description }}</div>
+    {% if full_5day_forecast %}
+      <h2>Standard 5-Day Forecast</h2>
+      <div class="forecast standard">
+        {% for day, info in full_5day_forecast %}
+          <div class="forecast-day">
+            <strong>{{ day }}</strong><br>
+            <img src="http://openweathermap.org/img/wn/{{ info.icon }}@2x.png">
+            <div>{{ info.temp }}{{ unit_label }} — {{ info.description }}</div>
+          </div>
+        {% endfor %}
       </div>
-    {% endfor %}
+    {% endif %}
   </div>
-{% endif %}
+
+  {% if map_url %}
+    <div class="map-embed">
+      <iframe
+        width="100%"
+        height="400"
+        style="border:0"
+        loading="lazy"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
+        src="{{ map_url }}">
+      </iframe>
+    </div>
+  {% endif %}
+</div>
 
   <script>
     function getLocationAndSubmit() {
